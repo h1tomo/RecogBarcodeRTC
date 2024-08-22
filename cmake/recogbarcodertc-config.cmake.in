@@ -1,0 +1,54 @@
+# RecogBarcodeRTC CMake config file
+#
+# This file sets the following variables:
+# RecogBarcodeRTC_FOUND - Always TRUE.
+# RecogBarcodeRTC_INCLUDE_DIRS - Directories containing the RecogBarcodeRTC include files.
+# RecogBarcodeRTC_IDL_DIRS - Directories containing the RecogBarcodeRTC IDL files.
+# RecogBarcodeRTC_LIBRARIES - Libraries needed to use RecogBarcodeRTC.
+# RecogBarcodeRTC_DEFINITIONS - Compiler flags for RecogBarcodeRTC.
+# RecogBarcodeRTC_VERSION - The version of RecogBarcodeRTC found.
+# RecogBarcodeRTC_VERSION_MAJOR - The major version of RecogBarcodeRTC found.
+# RecogBarcodeRTC_VERSION_MINOR - The minor version of RecogBarcodeRTC found.
+# RecogBarcodeRTC_VERSION_REVISION - The revision version of RecogBarcodeRTC found.
+# RecogBarcodeRTC_VERSION_CANDIDATE - The candidate version of RecogBarcodeRTC found.
+
+message(STATUS "Found RecogBarcodeRTC-@PROJECT_VERSION@")
+set(RecogBarcodeRTC_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(RecogBarcodeRTC_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(RecogBarcodeRTC_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(RecogBarcodeRTC_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(RecogBarcodeRTC_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(RecogBarcodeRTC_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(RecogBarcodeRTC_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(RecogBarcodeRTC_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(RecogBarcodeRTC_VERSION @PROJECT_VERSION@)
+set(RecogBarcodeRTC_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(RecogBarcodeRTC_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(RecogBarcodeRTC_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(RecogBarcodeRTC_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

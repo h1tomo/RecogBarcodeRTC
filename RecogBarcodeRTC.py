@@ -25,6 +25,8 @@ import cv2
 from pyzbar import pyzbar
 import numpy as np
 
+timer = 0
+
 
 # Import Service implementation class
 # <rtc-template block="service_impl">
@@ -59,7 +61,6 @@ recogbarcodertc_spec = ["implementation_id", "RecogBarcodeRTC",
 # 
 # </rtc-template>
 
-productID = 404
 
 def detect_and_draw_barcodes(frame):
         global productID 
@@ -86,6 +87,7 @@ def detect_and_draw_barcodes(frame):
             
             productID = least_three // 10;  #バーコードから下２，３桁目の値を取得
             print("Detected productID:", productID)
+
       #      barcode_type = barcode.type
       #      # 画面上に表示するテキストの整形
       #      text = f"{barcode_type}: {barcode_data}"
@@ -107,7 +109,7 @@ class RecogBarcodeRTC(OpenRTM_aist.DataFlowComponentBase):
         """
         """
         self._image_inIn = OpenRTM_aist.InPort("image_in", self._d_image_in)
-        self._d_id_out = OpenRTM_aist.instantiateDataType(RTC.TimedShort)
+        self._d_id_out = OpenRTM_aist.instantiateDataType(RTC.TimedLong)
         """
         """
         self._id_outOut = OpenRTM_aist.OutPort("id_out", self._d_id_out)
@@ -222,7 +224,10 @@ class RecogBarcodeRTC(OpenRTM_aist.DataFlowComponentBase):
     # @return RTC::ReturnCode_t
     #
     #
+
     def onExecute(self, ec_id):
+        global timer
+
         if self._image_inIn.isNew():
             img = self._image_inIn.read()
             
@@ -239,12 +244,27 @@ class RecogBarcodeRTC(OpenRTM_aist.DataFlowComponentBase):
                 frame = image_data.reshape((height, width, 3))
                 #print(frame)
 
-            # バーコード検出と描画処理
+            # バーコード検出と送信処理
                 frame , productID = detect_and_draw_barcodes(frame)
+
+                if productID == 404:
+                    #print("not found")
+                    timer += 1
+                    if timer > 300:
+                        self._d_id_out.data = productID
+                        self._id_outOut.write()
+                        timer = 0
+                    else:
+                        pass
+                else:
+                    self._d_id_out.data = productID
+                    self._id_outOut.write()
+                    timer = 0
+
             
             # productID を _id_outOut ポートから出力
-                self._d_id_out.data = productID
-                self._id_outOut.write()
+                #self._d_id_out.data = productID
+                #self._id_outOut.write()
                 
 
             # フレームを表示
@@ -320,8 +340,6 @@ class RecogBarcodeRTC(OpenRTM_aist.DataFlowComponentBase):
     #def onRateChanged(self, ec_id):
     #
     #    return RTC.RTC_OK
-	
-
 
 
 def RecogBarcodeRTCInit(manager):
